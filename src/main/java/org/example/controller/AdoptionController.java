@@ -1,2 +1,4 @@
-package org.example.controller;public class AdoptionController {
+package org.example.controller;
+
+public class AdoptionController {
 }

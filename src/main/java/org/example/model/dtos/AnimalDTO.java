@@ -1,8 +1,16 @@
-package org.example.model;
+package org.example.model.dtos;
 
-public class Animal
+import lombok.*;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
+public class AnimalDTO
 {
-    private int id;
+    private Long id;
     private String name;
     private int age;
     private String  race;

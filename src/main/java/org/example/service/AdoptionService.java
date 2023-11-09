@@ -1,2 +1,5 @@
-package org.example.service;public class AdoptionService {
+package org.example.service;
+
+public class AdoptionService
+{
 }

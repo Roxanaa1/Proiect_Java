@@ -1,2 +1,4 @@
-package org.example.repository;public class AdoptionRepository {
+package org.example.repository;
+
+public class AdoptionRepository {
 }
