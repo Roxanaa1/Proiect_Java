@@ -1,5 +1,6 @@
 package org.example.model.entities;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 @Setter
@@ -7,9 +8,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
+@Entity
+@Table(name="animals")
 public class AnimalEntity
 {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
         private String name;
         private int age;

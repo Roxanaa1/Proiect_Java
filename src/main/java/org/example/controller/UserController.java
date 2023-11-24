@@ -1,7 +1,9 @@
 package org.example.controller;
+
 import jakarta.validation.Valid;
 import org.example.model.dtos.CustomResponseDTO;
-import org.example.model.dtos.UserDTO;
+import org.example.model.dtos.UserCreateDTO;
+import org.example.model.dtos.UserSearchDTO;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,95 +13,57 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(path = "/api/v1")
-public class UserController
-{
+public class UserController {
 
-    List<UserDTO> userDTOList = new ArrayList<>();
+    List<UserCreateDTO> userCreateDTOList = new ArrayList<>();
     private final UserService userService;
 
     @Autowired
-    UserController(UserService userService)
-    {
+    UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping(path = "/user")//POST-creaza alt user
-    public ResponseEntity<CustomResponseDTO> createNewUser(
-            @RequestBody
-            @Valid
-            UserDTO userDTO,
-            BindingResult bindingResult)
-    {
+
+    @PostMapping(path = "/user")
+    public ResponseEntity<CustomResponseDTO> createNewUser(@RequestBody @Valid UserCreateDTO userCreateDTO, BindingResult bindingResult) {
         CustomResponseDTO customResponseDTO = new CustomResponseDTO();
 
-        if (bindingResult.hasErrors())
-        {
+        if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getFieldError().getDefaultMessage();
             customResponseDTO.setResponseObject(null);
             customResponseDTO.setResponseMessage(errorMessage);
             return new ResponseEntity<>(customResponseDTO, HttpStatus.BAD_REQUEST);
         }
-        userService.createUser(userDTO);
-        customResponseDTO.setResponseObject(userDTO);
-        userDTOList.add(userDTO);
+        UserSearchDTO userSearchDTO = userService.createUser(userCreateDTO);
+
+        customResponseDTO.setResponseObject(userSearchDTO);
         customResponseDTO.setResponseMessage("User created successfully");
         return new ResponseEntity<>(customResponseDTO, HttpStatus.CREATED);
     }
 
+    @DeleteMapping(path = "/user/{userId}")
+    public ResponseEntity deleteUser(@PathVariable Long userId){
+        userService.deleteUserById(userId);
+        return new ResponseEntity("User deleted", HttpStatus.OK);
+    }
+
 
     @GetMapping("/getUsersByFirstName/{firstName}")
-//    public List<User> getUsersByFirstName(@RequestParam String firstName){ -> Query param ?firstName=alex
-    public List<UserDTO> getUsersByFirstName(@PathVariable String firstName)
-    { // -> Path param ../23 (23 fiind id-ul)
-        return userService.findUsersByFirstName(firstName);
-    }
-    @GetMapping("/getUsersById/{id}")
-    public List<UserDTO> getUserById(@PathVariable Long id)
-    {
-        return userService.findUsersById(id);
-    }
-
-    @PutMapping(path = "/user/{id}")//PUT-actualizeaza
-    public ResponseEntity<CustomResponseDTO> updateUser(
-            @PathVariable Long id,
-            @RequestBody @Valid UserDTO userDTO,
-            BindingResult bindingResult)
-    {
+    public ResponseEntity<CustomResponseDTO> getUsersByFirstName(@PathVariable String firstName) { // -> Path param ../23 (23 fiind id-ul)
 
         CustomResponseDTO customResponseDTO = new CustomResponseDTO();
-        if (bindingResult.hasErrors())
-        {
-            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
-            customResponseDTO.setResponseObject(null);
-            customResponseDTO.setResponseMessage(errorMessage);
-            return new ResponseEntity<>(customResponseDTO, HttpStatus.BAD_REQUEST);
+        List<UserSearchDTO> foundUsers = userService.findUsersByFirstName(firstName);
+        if(Objects.isNull(foundUsers)|| foundUsers.isEmpty()){
+            customResponseDTO.setResponseMessage("No user was found by this first name.");
+            return new ResponseEntity<>(customResponseDTO, HttpStatus.NOT_FOUND);
         }
-
-        userService.updateUser(id, userDTO);
-        customResponseDTO.setResponseObject(userDTO);
-        customResponseDTO.setResponseMessage("User updated successfully");
+        customResponseDTO.setResponseObject(foundUsers);
+        customResponseDTO.setResponseMessage("Users found successfully!");
         return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/user/{id}")
-    public ResponseEntity<CustomResponseDTO> deleteUser(@PathVariable Long id)
-    {
-        CustomResponseDTO customResponseDTO = new CustomResponseDTO();
-
-        if (userService.deleteUser(id))
-        {
-            customResponseDTO.setResponseMessage("User deleted successfully");
-            return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
-        } else
-        {
-            customResponseDTO.setResponseMessage("User not found");
-            return new ResponseEntity<>(customResponseDTO, HttpStatus.NOT_FOUND);
-        }
-    }
-
-
 }
-

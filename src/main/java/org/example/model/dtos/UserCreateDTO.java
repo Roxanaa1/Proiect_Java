@@ -1,5 +1,4 @@
 package org.example.model.dtos;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -9,14 +8,12 @@ import lombok.*;
 @Getter
 @ToString
 @Builder
-@Setter
-public class UserDTO
-{
-        private Long id;
+public class UserCreateDTO {
+
         private String firstName;
         private String lastName;
         private String username;
-
+        //    private JobProfile jobProfile;
         @NotBlank(message = "Emailul nu poate fi null.")
         private String email;
 

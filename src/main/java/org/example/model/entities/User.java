@@ -1,13 +1,18 @@
 package org.example.model.entities;
+import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
-@Setter
+import java.util.List;
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class UserEntity
-{
+@Entity(name = "user")
+@Table(name = "users")
+public class User {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
         private String firstName;
         private String lastName;
@@ -16,6 +21,7 @@ public class UserEntity
         private int age;
         private String password;
 
-        public void set(Long newId) {
-        }
+        @OneToMany(mappedBy = "user")
+        private List<Purchase> purchases;
+
 }

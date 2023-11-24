@@ -9,8 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CustomResponseDTO
-{
+public class CustomResponseDTO {
+
         //    @JsonIgnore
         private Object responseObject;
         private String responseMessage;
