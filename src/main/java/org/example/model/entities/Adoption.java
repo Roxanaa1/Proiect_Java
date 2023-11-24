@@ -23,6 +23,6 @@ public class Adoption
     @NotNull
     private long userId;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user__id")
     private User user;
 }

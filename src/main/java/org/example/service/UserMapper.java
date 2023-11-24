@@ -1,7 +1,4 @@
 package org.example.service;
-
-
-
 import org.example.model.dtos.UserCreateDTO;
 import org.example.model.dtos.UserSearchDTO;
 import org.example.model.entities.User;

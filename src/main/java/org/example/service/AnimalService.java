@@ -1,32 +1,40 @@
 package org.example.service;
-
+import jakarta.transaction.Transactional;
+import org.example.model.dtos.AnimalCreateDTO;
 import org.example.model.dtos.AnimalSearchDTO;
-import org.example.model.dtos.UserDTO;
+import org.example.model.dtos.UserCreateDTO;
+import org.example.model.dtos.UserSearchDTO;
 import org.example.model.entities.AnimalEntity;
-import org.example.model.entities.UserEntity;
+import org.example.model.entities.User;
 import org.example.repository.AnimalRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AnimalService
 {
     private final AnimalRepository animalRepository;
     private final AnimalMapper animalMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    AnimalService(AnimalRepository animalRepository, AnimalMapper animalMapper)
+    AnimalService(AnimalRepository animalRepository, AnimalMapper animalMapper,ModelMapper modelMapper)
     {
         this.animalRepository = animalRepository;
         this.animalMapper = animalMapper;
+        this.modelMapper=modelMapper;
     }
-
-//    public List<AnimalDTO> findAnimalsById(Long id)
-//    {
-//        return animalRepository.findById(id);
-//    }
-
-
+    public List<AnimalSearchDTO> findAnimalsById(Long id)
+    {
+        // validate, transform...
+        return animalRepository.findById( id).stream()
+                .map(entity->animalMapper.mapAnimalEntityToAnimalDTO(entity))
+                .collect(Collectors.toList());
+    }
     public AnimalSearchDTO createAnimal(AnimalSearchDTO animalToCreateDTO)
     {
 
@@ -37,20 +45,25 @@ public class AnimalService
 
     }
 
+    @Transactional
+    public AnimalCreateDTO updateAnimal(Long id, AnimalCreateDTO animalCreateDTO)
+    {
+        // Verifică dacă utilizatorul există în baza de date
+        AnimalEntity existingAnimal = animalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Animal not found with id " + id));
 
-//    public AnimalDTO updateAnimal(Long id, AnimalDTO animalDTO) {
-//        AnimalEntity animalEntity = new AnimalEntity();
-//        // Setează proprietățile lui AnimalEntity în funcție de AnimalDTO...
-//        animalEntity.setId(id);
-//        // ...alte setări...
-//
-//        animalRepository.save(animalEntity);
-//        return animalDTO; // sau returnează un AnimalDTO transformat din AnimalEntity actualizat
-//    }
+        modelMapper.map(animalCreateDTO, existingAnimal);
+
+        // Salvează entitatea actualizată în baza de date
+        AnimalEntity updatedAnimal = animalRepository.save(existingAnimal);
+
+        return modelMapper.map(updatedAnimal, AnimalCreateDTO.class);
+    }
 
 
-//    public boolean deleteAnimal(Long id)
-//    {
-//        return animalRepository.deleteById(id);
-//    }
+    public void deleteAnimalById(Long id)
+    {
+        //validari ex daca exista userul
+        animalRepository.deleteById(id);
+    }
 }

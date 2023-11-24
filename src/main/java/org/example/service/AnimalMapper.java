@@ -1,9 +1,6 @@
 package org.example.service;
-
 import org.example.model.dtos.AnimalSearchDTO;
-import org.example.model.dtos.UserDTO;
 import org.example.model.entities.AnimalEntity;
-import org.example.model.entities.UserEntity;
 import org.springframework.stereotype.Component;
 
 @Component
