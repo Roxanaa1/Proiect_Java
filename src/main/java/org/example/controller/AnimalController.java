@@ -58,7 +58,7 @@ public class AnimalController
         AnimalSearchDTO animalSearchDTO= animalService.createAnimal(animalDTO);
 
         customResponseDTO.setResponseObject(animalDTO);
-        customResponseDTO.setResponseMessage("User created successfully");
+        customResponseDTO.setResponseMessage("Animal created successfully");
         return new ResponseEntity<>(customResponseDTO,HttpStatus.CREATED);
     }
 

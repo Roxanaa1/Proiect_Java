@@ -1,12 +1,17 @@
 package org.example.service;
 
+import jakarta.transaction.Transactional;
 import org.example.model.dtos.*;
 import org.example.model.entities.Adoption;
 import org.example.model.entities.User;
 import org.example.repository.AdoptionRepository;
 import org.example.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdoptionService
@@ -16,32 +21,51 @@ public class AdoptionService
     private final AdoptionMapper adoptionMapper;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
     AdoptionService(AdoptionRepository adoptionRepository, AdoptionMapper adoptionMapper,
-                    UserRepository userRepository, UserMapper userMapper) {
+                    UserRepository userRepository, UserMapper userMapper,ModelMapper modelMapper)
+    {
         this.adoptionRepository = adoptionRepository;
         this.adoptionMapper = adoptionMapper;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.modelMapper=modelMapper;
     }
 
-    public AdoptionSearchDTO makeAdoption(AdoptionCreateDTO adoptionCreateDTO) {
-        //validam userul, daca exista un user cu id-ul = user_id din request
+    public AdoptionSearchDTO createAdoption(AdoptionCreateDTO adoptionCreateDTO)
+    {
         User user = userRepository.findById(adoptionCreateDTO.getUserId()).orElseThrow(() -> new RuntimeException());
-
-        //construim un adoption entity pe baza adoptionCreateDTO (requestul de la client)
         Adoption adoption = adoptionMapper.mapAdoptionCreateDTOToAdoptionEntity(adoptionCreateDTO);
         adoption.setUser(user);
-        //salvam adoptia
         Adoption savedAdoption = adoptionRepository.save(adoption);
-
-        //construim un response object (UserSearchDTO) pe care il returnam catre controller
         UserSearchDTO userSearchDTO = userMapper.mapUserEntityToUserSearchDTO(savedAdoption.getUser());
         AdoptionSearchDTO adoptionSearchDTO = adoptionMapper.mapAdoptionEntityToAdoptionSearchDTO(savedAdoption);
         adoptionSearchDTO.setUser(userSearchDTO);
         return adoptionSearchDTO;
     }
+    public List<AdoptionSearchDTO> findAdoptionById(Long id)
+    {
+        // validate, transform...
+        return adoptionRepository.findById( id).stream()
+                .map(entity->adoptionMapper.mapAdoptionEntityToAdoptionSearchDTO(entity))
+                .collect(Collectors.toList());
+    }
+    public void deleteAdoptionById(Long id)
+    {
+        adoptionRepository.deleteById(id);
+    }
+    @Transactional
+    public AdoptionCreateDTO updateAdoption(Long id, AdoptionCreateDTO adoptionCreateDTO) {
+        Adoption existingAdoption = adoptionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Adoption not found with id " + id));
 
+        modelMapper.map(adoptionCreateDTO, existingAdoption);
+
+        Adoption updatedAdoption = adoptionRepository.save(existingAdoption);
+
+        return modelMapper.map(updatedAdoption, AdoptionCreateDTO.class);
+    }
 
 }
