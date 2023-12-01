@@ -35,9 +35,6 @@ public class UserUpdateDTO
     private int age;
 
     @NotNull
-    @NotBlank(message = "Password can not be blank")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]+$",
-            message = "Password must contain at least one letter, one digit, and one special character")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 }
