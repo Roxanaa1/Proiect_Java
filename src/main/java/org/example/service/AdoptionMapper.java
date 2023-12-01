@@ -1,10 +1,8 @@
 package org.example.service;
-
 import org.example.model.dtos.AdoptionCreateDTO;
 import org.example.model.dtos.AdoptionSearchDTO;
 import org.example.model.entities.Adoption;
 import org.springframework.stereotype.Component;
-
 @Component
 public class AdoptionMapper
 {

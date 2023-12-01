@@ -1,15 +1,13 @@
 package org.example.model.dtos;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @ToString
 @Builder
-public class UserSearchDTO {
-
+public class UserSearchDTO
+{
     private long id;
     private String firstName;
     private String lastName;

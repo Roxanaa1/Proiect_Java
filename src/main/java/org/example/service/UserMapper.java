@@ -3,7 +3,6 @@ import org.example.model.dtos.UserCreateDTO;
 import org.example.model.dtos.UserSearchDTO;
 import org.example.model.entities.User;
 import org.springframework.stereotype.Component;
-
 @Component
 public class UserMapper {
 

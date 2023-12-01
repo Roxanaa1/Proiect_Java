@@ -1,9 +1,9 @@
 package org.example.model.dtos;
-
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,13 +15,16 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AdoptionCreateDTO
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private long id;
+
     @NotNull
-    @Min(value = 0, message = "Animal ID must not be negative")
+    @NotBlank(message = "animalId can not be blank")
+    @Min(value = 0, message = "animalId must not be negative")
     private long animalId;
+
     @NotNull
-    @Min(value = 0, message = "User ID must not be negative")
+    @NotBlank(message = "userId can not be blank")
+    @Min(value = 0, message = "userId must not be negative")
     private long userId;
 }
