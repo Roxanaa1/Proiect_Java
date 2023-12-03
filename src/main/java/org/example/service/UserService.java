@@ -3,12 +3,16 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.example.model.dtos.UserCreateDTO;
 import org.example.model.dtos.UserSearchDTO;
+import org.example.model.dtos.UserUpdateDTO;
 import org.example.model.entities.User;
 import org.example.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
+
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 @Service
 public class UserService
@@ -52,33 +56,37 @@ public class UserService
                 .map(entity->userMapper.mapUserEntityToUserSearchDTO(entity))
                 .collect(Collectors.toList());
     }
-    @Transactional
-    public UserCreateDTO updateUser(Long id, UserCreateDTO userCreateDTO) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("Id has to be greater than zero");
-        }
 
-        try {
-            User existingUser = userRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
+//    public UserUpdateDTO updateUser(Long id, UserUpdateDTO userUpdateDTO)
+//    {
+//        User existingUser = userRepository.findById(id)
+//                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+//
+//        // Actualizeaza entitatea User cu datele primite din UserUpdateDTO
+//        existingUser.setFirstName(userUpdateDTO.getFirstName());
+//        existingUser.setLastName(userUpdateDTO.getLastName());
+//        existingUser.setUsername(userUpdateDTO.getUsername());
+//        existingUser.setEmail(userUpdateDTO.getEmail());
+//        existingUser.setAge(userUpdateDTO.getAge());
+//        existingUser.setPassword(userUpdateDTO.getPassword());
+//
+//        // Salveaza utilizatorul actualizat în baza de date
+//        User updatedUser = userRepository.save(existingUser);
+//
+//        // Returneaza un DTO cu datele utilizatorului actualizat
+//        return userMapper.mapUserEntityToUserUpdateDTO(updatedUser);
+//    }
+public UserSearchDTO updateUser(Long id, UserUpdateDTO userUpdateDTO)
+{
+    User existingUser = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-            // Verifică nulitatea înainte de mapare
-            if (existingUser != null) {
-                modelMapper.map(userCreateDTO, existingUser);
+    userMapper.updateUserFromDto(userUpdateDTO, existingUser);
 
-                // Salvează entitatea actualizată în baza de date
-                User updatedUser = userRepository.save(existingUser);
+    User updatedUser = userRepository.save(existingUser);
 
-                return modelMapper.map(updatedUser, UserCreateDTO.class);
-            } else {
-                throw new IllegalStateException("Existing user is null");
-            }
-        } catch (EntityNotFoundException e) {
-            System.out.println("A apărut o excepție: " + e.getMessage());
-            return null;
-        }
-    }
-
+    return userMapper.mapUserEntityToUserSearchDTO(updatedUser);
+}
 
     public void deleteUserById(Long id)
     {

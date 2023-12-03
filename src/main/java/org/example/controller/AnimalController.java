@@ -1,4 +1,5 @@
 package org.example.controller;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.example.model.dtos.*;
 import org.example.service.AnimalService;
@@ -23,7 +24,7 @@ public class AnimalController
     {
         this.animalService = animalService;
     }
-    @PostMapping(path = "/animal")
+    @PostMapping(path = "/animal/createAnimal")
     public ResponseEntity<CustomResponseDTO> createAnimal(
             @RequestBody
             @Valid
@@ -65,31 +66,29 @@ public class AnimalController
     }
 
 
-    @PutMapping(path = "/animal/{id}")
-    public ResponseEntity<CustomResponseDTO> updateAnimal(
+    @PutMapping(path = "/animal/updateAnimal/{id}")
+    public ResponseEntity<?> updateAnimal(
             @PathVariable Long id,
-            @RequestBody @Valid AnimalCreateDTO animalCreateDTO,
+            @RequestBody @Valid AnimalUpdateDTO animalUpdateDTO,
             BindingResult bindingResult)
     {
 
-        CustomResponseDTO customResponseDTO = new CustomResponseDTO();
         if (bindingResult.hasErrors())
         {
-            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
-            customResponseDTO.setResponseObject(null);
-            customResponseDTO.setResponseMessage(errorMessage);
-            return new ResponseEntity<>(customResponseDTO, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
         }
+        try {
+            AnimalSearchDTO updatedAnimal = animalService.updateAnimal(id, animalUpdateDTO);
+            return new ResponseEntity<>(updatedAnimal,HttpStatus.OK);
+        }catch (EntityNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 
-        AnimalCreateDTO updatedDTO = animalService.updateAnimal(id, animalCreateDTO);
-        customResponseDTO.setResponseObject(updatedDTO);
-        customResponseDTO.setResponseMessage("Animal updated successfully");
-
-        return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
+        }
     }
 
 
-    @DeleteMapping(path = "/animal/{animalId}")
+    @DeleteMapping(path = "/animal/deleteAnimal/{animalId}")
     public ResponseEntity deleteAnimal(@PathVariable Long animalId)
     {
         animalService.deleteAnimalById(animalId);

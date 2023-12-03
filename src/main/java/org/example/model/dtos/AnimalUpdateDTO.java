@@ -22,7 +22,6 @@ public class AnimalUpdateDTO
     private String name;
 
     @NotNull
-    @NotBlank(message = "Age must not be blank")
     @Min(value = 0, message = "Age must be a positive number")
     private int age;
 

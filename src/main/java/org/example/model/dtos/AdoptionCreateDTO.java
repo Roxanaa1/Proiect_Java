@@ -16,15 +16,11 @@ import lombok.Setter;
 public class AdoptionCreateDTO
 {
 
-    private long id;
-
     @NotNull
-    @NotBlank(message = "animalId can not be blank")
     @Min(value = 0, message = "animalId must not be negative")
     private long animalId;
 
     @NotNull
-    @NotBlank(message = "userId can not be blank")
     @Min(value = 0, message = "userId must not be negative")
     private long userId;
 }

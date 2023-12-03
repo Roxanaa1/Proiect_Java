@@ -14,8 +14,6 @@ import lombok.*;
 public class UserCreateDTO
 {
 
-        private long id;
-
         @NotNull
         @NotBlank(message = "First name can not be blank")
         private String firstName;

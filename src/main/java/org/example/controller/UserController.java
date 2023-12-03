@@ -1,8 +1,10 @@
 package org.example.controller;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.example.model.dtos.CustomResponseDTO;
 import org.example.model.dtos.UserCreateDTO;
 import org.example.model.dtos.UserSearchDTO;
+import org.example.model.dtos.UserUpdateDTO;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,7 @@ public class UserController
     UserController(UserService userService) {
         this.userService = userService;
     }
-    @PostMapping(path = "/user")
+    @PostMapping(path = "/user/createUser")
     public ResponseEntity<CustomResponseDTO> createNewUser(@RequestBody @Valid
                                                            UserCreateDTO userCreateDTO,
                                                            BindingResult bindingResult)
@@ -44,7 +46,6 @@ public class UserController
 
         return new ResponseEntity<>(customResponseDTO, HttpStatus.CREATED);
     }
-
     @GetMapping("/user/getUsersByFirstName/{firstName}")
     public ResponseEntity<CustomResponseDTO> getUsersByFirstName(@PathVariable String firstName)
     {
@@ -78,32 +79,38 @@ public class UserController
         return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
     }
 
-    @PutMapping(path = "/user/{id}")
-    public ResponseEntity<CustomResponseDTO> updateUser(
-            @PathVariable Long id,
-            @RequestBody @Valid UserCreateDTO userCreateDTO,
-            BindingResult bindingResult)
+//    @PutMapping(path = "/user/updateUser/{id}")
+//    public ResponseEntity<UserUpdateDTO> updateUser(@PathVariable("id") Long id,
+//                                                    @Valid @RequestBody UserUpdateDTO userUpdateDTO,
+//                                                    BindingResult bindingResult)
+//    {
+//        if (bindingResult.hasErrors())
+//        {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        UserUpdateDTO updateDTO = userService.updateUser(id, userUpdateDTO);
+//        return new ResponseEntity<>(updateDTO, HttpStatus.OK);
+//    }
+@PutMapping(path = "/user/updateUser/{id}")
+public ResponseEntity<?> updateUser(@PathVariable("id") Long id,
+                                    @Valid @RequestBody UserUpdateDTO userUpdateDTO,
+                                    BindingResult bindingResult)
+{
+
+    if (bindingResult.hasErrors())
     {
-
-        CustomResponseDTO customResponseDTO = new CustomResponseDTO();
-        if (bindingResult.hasErrors())
-        {
-            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
-            customResponseDTO.setResponseObject(null);
-            customResponseDTO.setResponseMessage(errorMessage);
-            return new ResponseEntity<>(customResponseDTO, HttpStatus.BAD_REQUEST);
-        }
-
-        UserCreateDTO updatedDTO = userService.updateUser(id, userCreateDTO);
-
-        customResponseDTO.setResponseObject(updatedDTO);
-        customResponseDTO.setResponseMessage("User updated successfully");
-
-        return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
+        return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
     }
+    try {
+        UserSearchDTO updatedUser = userService.updateUser(id, userUpdateDTO);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    } catch (EntityNotFoundException e)
+    {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+}
 
-
-    @DeleteMapping(path = "/user/{userId}")
+    @DeleteMapping(path = "/user/deleteUser/{userId}")
     public ResponseEntity deleteUser(@PathVariable Long userId)
     {
         userService.deleteUserById(userId);

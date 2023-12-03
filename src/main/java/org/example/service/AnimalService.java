@@ -3,7 +3,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.example.model.dtos.AnimalCreateDTO;
 import org.example.model.dtos.AnimalSearchDTO;
+import org.example.model.dtos.AnimalUpdateDTO;
 import org.example.model.entities.AnimalEntity;
+import org.example.model.entities.User;
 import org.example.repository.AnimalRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,36 +46,16 @@ public class AnimalService
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public AnimalCreateDTO updateAnimal(Long id, AnimalCreateDTO animalCreateDTO)
+    public AnimalSearchDTO updateAnimal(Long id, AnimalUpdateDTO animalUpdateDTO)
     {
-        if(id==null || id<=0)
-        {
-            throw new IllegalArgumentException("Id-ul trebuie sa fie un numar pozitiv nenul");
-        }
+        AnimalEntity existingAnimal = animalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Animal not found"));
 
-        try {
-            // Verifică dacă animalul există în baza de date
-            AnimalEntity existingAnimal = animalRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Animal not found with id " + id));
+        animalMapper.updateAnimalFromDto(animalUpdateDTO, existingAnimal);
 
-            // Verifică nulitatea înainte de mapare
-            if (existingAnimal != null)
-            {
-                modelMapper.map(animalCreateDTO, existingAnimal);
-                // Salvează entitatea actualizată în baza de date
-                AnimalEntity updatedAnimal = animalRepository.save(existingAnimal);
+        AnimalEntity updatedAnimal = animalRepository.save(existingAnimal);
 
-                return modelMapper.map(updatedAnimal, AnimalCreateDTO.class);
-            } else
-            {
-                return null;
-            }
-        } catch (RuntimeException e)
-        {
-            System.out.println("A apărut o excepție: " + e.getMessage());
-           return null;
-        }
+        return animalMapper.mapAnimalEntityToAnimalSearchDTO(updatedAnimal);
     }
 
 
