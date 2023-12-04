@@ -1,4 +1,5 @@
 package org.example.controller;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.example.model.dtos.*;
 import org.example.service.AdoptionService;
@@ -55,28 +56,48 @@ public class AdoptionController
         return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
     }
     @PutMapping(path = "/adoption/{id}")
-    public ResponseEntity<CustomResponseDTO> updateAdoption(
+//    public ResponseEntity<CustomResponseDTO> updateAdoption(
+//            @PathVariable Long id,
+//            @RequestBody @Valid AdoptionCreateDTO adoptionCreateDTO,
+//            BindingResult bindingResult)
+//    {
+//
+//        CustomResponseDTO customResponseDTO = new CustomResponseDTO();
+//        if (bindingResult.hasErrors())
+//        {
+//            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+//            customResponseDTO.setResponseObject(null);
+//            customResponseDTO.setResponseMessage(errorMessage);
+//            return new ResponseEntity<>(customResponseDTO, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        AdoptionCreateDTO updatedDTO = adoptionService.updateAdoption(id, adoptionCreateDTO);
+//
+//        customResponseDTO.setResponseObject(updatedDTO);
+//        customResponseDTO.setResponseMessage("Adoption updated successfully");
+//
+//        return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
+//    }
+    public ResponseEntity<?> updateAdoption(
             @PathVariable Long id,
-            @RequestBody @Valid AdoptionCreateDTO adoptionCreateDTO,
+            @RequestBody @Valid AdoptionUpdateDTO adoptionUpdateDTO,
             BindingResult bindingResult)
     {
 
-        CustomResponseDTO customResponseDTO = new CustomResponseDTO();
         if (bindingResult.hasErrors())
         {
-            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
-            customResponseDTO.setResponseObject(null);
-            customResponseDTO.setResponseMessage(errorMessage);
-            return new ResponseEntity<>(customResponseDTO, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
         }
+        try {
+            AdoptionSearchDTO updatedAdoption = adoptionService.updateAdoption(id, adoptionUpdateDTO);
+            return new ResponseEntity<>(updatedAdoption,HttpStatus.OK);
+        }catch (EntityNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 
-        AdoptionCreateDTO updatedDTO = adoptionService.updateAdoption(id, adoptionCreateDTO);
-
-        customResponseDTO.setResponseObject(updatedDTO);
-        customResponseDTO.setResponseMessage("Adoption updated successfully");
-
-        return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
+        }
     }
+
 
 
     @DeleteMapping(path = "/adoption/{adoptionId}")

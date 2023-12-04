@@ -3,6 +3,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.example.model.dtos.*;
 import org.example.model.entities.Adoption;
+import org.example.model.entities.AnimalEntity;
 import org.example.model.entities.User;
 import org.example.repository.AdoptionRepository;
 import org.example.repository.UserRepository;
@@ -54,21 +55,19 @@ public class AdoptionService
                 .map(entity->adoptionMapper.mapAdoptionEntityToAdoptionSearchDTO(entity))
                 .collect(Collectors.toList());
     }
-    @Transactional
-    public AdoptionCreateDTO updateAdoption(Long id, AdoptionCreateDTO adoptionCreateDTO)
-    {
-        if (id == null || id <= 0)
-        {
-            throw new IllegalArgumentException("Id-ul trebuie să fie un număr pozitiv nenul.");
-        }
-        Adoption existingAdoption = adoptionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Adoption not found with id " + id));
+//
+public AdoptionSearchDTO updateAdoption(Long id, AdoptionUpdateDTO adoptionUpdateDTO)
+{
+    Adoption existingAdoption = adoptionRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Adoption not found"));
 
-        modelMapper.map(adoptionCreateDTO, existingAdoption);
-        Adoption updatedAdoption = adoptionRepository.save(existingAdoption);
+    adoptionMapper.updateAdoptionFromDto(adoptionUpdateDTO, existingAdoption);
 
-        return modelMapper.map(updatedAdoption, AdoptionCreateDTO.class);
-    }
+    Adoption updatedAdoption  = adoptionRepository.save(existingAdoption);
+
+    return adoptionMapper.mapAdoptionEntityToAdoptionSearchDTO(updatedAdoption);
+}
+
 
     public void deleteAdoptionById(Long id)
     {
