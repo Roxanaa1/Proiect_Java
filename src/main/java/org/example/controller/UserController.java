@@ -78,8 +78,28 @@ public class UserController
 
         return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
     }
+    @GetMapping("/users/getUsers")
+    public ResponseEntity<CustomResponseDTO> getUsers(
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName) {
 
-//    @PutMapping(path = "/user/updateUser/{id}")
+        CustomResponseDTO customResponseDTO = new CustomResponseDTO();
+        List<UserSearchDTO> foundUsers = userService.findUsers(id, firstName, lastName);
+
+        if (foundUsers.isEmpty()) {
+            customResponseDTO.setResponseMessage("No users were found with the provided criteria.");
+            return new ResponseEntity<>(customResponseDTO, HttpStatus.NOT_FOUND);
+        }
+
+        customResponseDTO.setResponseObject(foundUsers);
+        customResponseDTO.setResponseMessage("Users found successfully!");
+
+        return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
+    }
+
+
+    //    @PutMapping(path = "/user/updateUser/{id}")
 //    public ResponseEntity<UserUpdateDTO> updateUser(@PathVariable("id") Long id,
 //                                                    @Valid @RequestBody UserUpdateDTO userUpdateDTO,
 //                                                    BindingResult bindingResult)

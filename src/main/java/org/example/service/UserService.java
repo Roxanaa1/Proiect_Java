@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @Service
 public class UserService
@@ -56,8 +58,22 @@ public class UserService
                 .map(entity->userMapper.mapUserEntityToUserSearchDTO(entity))
                 .collect(Collectors.toList());
     }
+    public List<UserSearchDTO> findUsers(Long id, String firstName, String lastName) {
+        List<User> userEntities;
 
-//    public UserUpdateDTO updateUser(Long id, UserUpdateDTO userUpdateDTO)
+        if (id != null && id > 0) {
+            Optional<User> userEntity = userRepository.findById(id);
+            userEntities = userEntity.map(Collections::singletonList).orElse(Collections.emptyList());
+        } else {
+            userEntities = userRepository.findByFirstNameAndLastName(firstName, lastName);
+        }
+
+        return userEntities.stream()
+                .map(userMapper::mapUserEntityToUserSearchDTO)
+                .collect(Collectors.toList());
+    }
+
+    //    public UserUpdateDTO updateUser(Long id, UserUpdateDTO userUpdateDTO)
 //    {
 //        User existingUser = userRepository.findById(id)
 //                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
