@@ -55,7 +55,6 @@ public class AdoptionService
                 .map(entity->adoptionMapper.mapAdoptionEntityToAdoptionSearchDTO(entity))
                 .collect(Collectors.toList());
     }
-//
 public AdoptionSearchDTO updateAdoption(Long id, AdoptionUpdateDTO adoptionUpdateDTO)
 {
     Adoption existingAdoption = adoptionRepository.findById(id)

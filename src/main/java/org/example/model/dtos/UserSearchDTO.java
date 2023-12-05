@@ -4,6 +4,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @Builder
 public class UserSearchDTO
@@ -16,4 +17,5 @@ public class UserSearchDTO
     private int age;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
 }

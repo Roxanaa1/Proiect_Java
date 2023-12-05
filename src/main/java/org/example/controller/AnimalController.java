@@ -89,10 +89,16 @@ public class AnimalController
 
 
     @DeleteMapping(path = "/animal/deleteAnimal/{animalId}")
-    public ResponseEntity deleteAnimal(@PathVariable Long animalId)
+    public ResponseEntity deleteAnimal(@PathVariable Long animalId,BindingResult bindingResult)
     {
-        animalService.deleteAnimalById(animalId);
-        return new ResponseEntity("User deleted", HttpStatus.OK);
+        try{
+            animalService.deleteAnimalById(animalId);
+            return new ResponseEntity("Animal deleted",HttpStatus.OK);
+        }
+        catch (EntityNotFoundException e)
+        {
+            return new ResponseEntity(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
     }
 
 }

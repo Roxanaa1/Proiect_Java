@@ -113,7 +113,13 @@ public ResponseEntity<?> updateUser(@PathVariable("id") Long id,
     @DeleteMapping(path = "/user/deleteUser/{userId}")
     public ResponseEntity deleteUser(@PathVariable Long userId)
     {
-        userService.deleteUserById(userId);
-        return new ResponseEntity("User deleted", HttpStatus.OK);
+        try{
+            userService.deleteUserById(userId);
+            return new ResponseEntity("User deleted",HttpStatus.OK);
+        }
+        catch (EntityNotFoundException e)
+        {
+            return new ResponseEntity(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
     }
 }

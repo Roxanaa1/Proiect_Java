@@ -56,28 +56,6 @@ public class AdoptionController
         return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
     }
     @PutMapping(path = "/adoption/{id}")
-//    public ResponseEntity<CustomResponseDTO> updateAdoption(
-//            @PathVariable Long id,
-//            @RequestBody @Valid AdoptionCreateDTO adoptionCreateDTO,
-//            BindingResult bindingResult)
-//    {
-//
-//        CustomResponseDTO customResponseDTO = new CustomResponseDTO();
-//        if (bindingResult.hasErrors())
-//        {
-//            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
-//            customResponseDTO.setResponseObject(null);
-//            customResponseDTO.setResponseMessage(errorMessage);
-//            return new ResponseEntity<>(customResponseDTO, HttpStatus.BAD_REQUEST);
-//        }
-//
-//        AdoptionCreateDTO updatedDTO = adoptionService.updateAdoption(id, adoptionCreateDTO);
-//
-//        customResponseDTO.setResponseObject(updatedDTO);
-//        customResponseDTO.setResponseMessage("Adoption updated successfully");
-//
-//        return new ResponseEntity<>(customResponseDTO, HttpStatus.OK);
-//    }
     public ResponseEntity<?> updateAdoption(
             @PathVariable Long id,
             @RequestBody @Valid AdoptionUpdateDTO adoptionUpdateDTO,
@@ -103,8 +81,14 @@ public class AdoptionController
     @DeleteMapping(path = "/adoption/{adoptionId}")
     public ResponseEntity deleteAdoption(@PathVariable Long adoptionId)
     {
-        adoptionService.deleteAdoptionById(adoptionId);
-        return new ResponseEntity("Adoption deleted", HttpStatus.OK);
+        try{
+            adoptionService.deleteAdoptionById(adoptionId);
+            return new ResponseEntity("Adoption deleted",HttpStatus.OK);
+        }
+        catch (EntityNotFoundException e)
+        {
+            return new ResponseEntity(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
     }
 
 }
