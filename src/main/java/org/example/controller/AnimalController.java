@@ -89,7 +89,7 @@ public class AnimalController
 
 
     @DeleteMapping(path = "/animal/deleteAnimal/{animalId}")
-    public ResponseEntity deleteAnimal(@PathVariable Long animalId,BindingResult bindingResult)
+    public ResponseEntity deleteAnimal(@PathVariable Long animalId)
     {
         try{
             animalService.deleteAnimalById(animalId);

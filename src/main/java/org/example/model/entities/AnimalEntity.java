@@ -1,5 +1,7 @@
 package org.example.model.entities;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import java.util.List;
 @Data
@@ -12,9 +14,9 @@ public class AnimalEntity
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
-
+        @NotBlank
         private String name;
-
+        @Positive
         private int age;
 
         private String  race;
